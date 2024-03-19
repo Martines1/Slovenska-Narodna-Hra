@@ -6,3 +6,5 @@ class Pozadie:
         self.background = py.image.load("pozadie.png").convert()
         self.fps = 60
         
+    def change_phase(self,phase,py):
+        self.background = py.image.load("pozadie"+phase+".png").convert()
