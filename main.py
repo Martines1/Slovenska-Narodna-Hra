@@ -99,5 +99,3 @@ import scorebanner as sb
 #     #py.draw.rect(pozadie.obrazovka,(0,0,0),[player.rect.x,player.rect.y,75,100]) #75 100pozadie.obrazovka,(204,102,0),[b_x,b_y-300,300,300])
 #     #py.display.flip()
 #     py.display.update()
-
-######----------------######
