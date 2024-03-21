@@ -65,6 +65,8 @@ while(running):
     objects = []
     if phase==0:#les
         for ob in obstacles_0:
+            if(base_x+scroll_p>1250):
+                break
             if(ob=="nic"):
                 base_x+=80
             else:
