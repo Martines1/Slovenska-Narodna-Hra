@@ -69,6 +69,7 @@ class SNH:
                 self.player.rect.x = 1180 - 75
 
             objects = []
+            objects.append(py.draw.rect(self.pozadie.obrazovka,(185,122,87),[0,661,1200,1]))#zem
             if self.world_phase == 0:  # les
                 for obstacle in self.obstacles_forest:
                     if (obstacle == "nic"):
