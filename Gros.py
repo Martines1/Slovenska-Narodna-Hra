@@ -6,12 +6,12 @@ class Gros:
 
     def __init__(self):
         self.x = 1200
-        self.y = 0
+        self.y = 250
         self.pattern = ['triangle','worm','square']
         self.coords = []
         self.width = 0
         self.amount = 0
-
+        self.generate()
 
     def getAmount(self):
         return str(self.amount)

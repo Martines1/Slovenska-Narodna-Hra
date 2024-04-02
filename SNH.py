@@ -4,6 +4,7 @@ from pozadie import Pozadie
 from structure_creator import StructureCreator
 from player import Player
 from scorebanner import Scorebanner
+from Gros import Gros
 
 
 class SNH:
@@ -13,6 +14,7 @@ class SNH:
         self.WIDTH = 1200
         self.HEIGHT = 700
         self.fps = 60
+        self.gros_bg = 1200
         self.scroll_background = 0
         self.scroll_obstacles = 0
         self.world_phase = 0  # 0-pozadie.png
@@ -32,6 +34,7 @@ class SNH:
 
         self.timer = py.time.Clock()
         self.running = True
+        self.peniaz = Gros()
 
         # nacitaj hraca
         self.player = Player()
@@ -46,13 +49,31 @@ class SNH:
             self.timer.tick(self.fps)
             pressed_key = py.key.get_pressed()
             # vykreslenie pozadia
+            self.pozadie.obrazovka.blit(self.pozadie.fixed_background,[0,0])
             for i in range(0, self.tiles):
-                self.pozadie.obrazovka.blit(self.pozadie.background, [i * self.bg_width + self.scroll_background, 0])
+                self.pozadie.obrazovka.blit(self.pozadie.background, [i * self.bg_width + self.scroll_background, 2])
             self.scroll_background -= 2
             if (abs(self.scroll_background) > self.bg_width):
                 self.scroll_background = 0
             for entity in self.all_sprites:
                 self.pozadie.obrazovka.blit(entity.curr_image, entity.rect)
+
+            self.gros_bg -= 2
+
+            if self.gros_bg == -50 * (self.peniaz.width + 1):
+                self.gros_bg = 1200
+                self.peniaz.x = 1200
+                self.peniaz.generate()
+                self.gros_y = objects[-1].y - 100
+                self.scorebanner.set_grose(self.scorebanner.grose+1)
+
+            for gros in self.peniaz.coords:
+                if abs(self.gros_bg + gros[0] - self.player.rect.x) < 50 and abs(self.peniaz.y - gros[1] - self.player.rect.y) < 50:
+                    self.peniaz.coords.remove(gros)
+                    self.peniaz.amount += 1
+                    self.scorebanner.set_grose(self.peniaz.amount)
+                    continue
+                self.pozadie.obrazovka.blit(self.peniaz.drawGros(), [self.gros_bg + gros[0],self.peniaz.y - gros[1]])
 
             # Update a kreslenie scorebannera
             self.scorebanner.update()
@@ -69,6 +90,7 @@ class SNH:
                 self.player.rect.x = 1180 - 75
 
             objects = []
+            objects.append(py.draw.rect(self.pozadie.obrazovka,(53,55,33),[0,661,1200,1]))#zem
             if self.world_phase == 0:  # les
                 for obstacle in self.obstacles_forest:
                     if (obstacle == "nic"):
