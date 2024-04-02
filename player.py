@@ -22,7 +22,7 @@ class Player(py.sprite.Sprite):
         self.image_source = "images" + delimiter 
         super(Player, self).__init__()
         self.jumping = False
-        self.curr_image = self.load_image('idle0.png')
+        self.curr_image = self.load_image('janosik0.png')
         self.rect = py.Rect(50, 350, 75, 100)
 
         self.rect.x = self.x_position
@@ -36,7 +36,8 @@ class Player(py.sprite.Sprite):
         self.animation_timer = 0
         self.current_idle = 0
         self.current_run = 0
-        self.standing = False
+        self.current_jump = 0
+        self.standing = True
 
     def load_image(self, image: str, flip : bool = False):
         new_image = py.image.load(self.image_source + image)
@@ -50,43 +51,44 @@ class Player(py.sprite.Sprite):
     def update(self, key, objects = None):
         if key[K_RIGHT]:
             self.animation_timer += 1
-            if self.animation_timer % 10 == 0:
-                self.current_run = (self.current_run + 1) % 3
+            if self.animation_timer % 2 == 0:
+                self.current_run = (self.current_run + 1) % 5
                 flip = False
                 if self.image_rotation == 'left':
                     flip = True
                     self.image_rotation = 'right' 
                 if not self.jumping:
-                    self.curr_image = self.load_image(f'run{self.current_run}.png', flip)
+                    self.curr_image = self.load_image(f'janosik{self.current_run}.png', flip)
             self.x_velocity = 4
         elif key[K_LEFT]:
             self.animation_timer += 1
-            if self.animation_timer % 10 == 0:
-                self.current_run = (self.current_run + 1) % 3
+            if self.animation_timer % 2 == 0:
+                self.current_run = (self.current_run + 1) % 5
                 if self.image_rotation == 'right':
                     self.image_rotation = 'left' 
                 if not self.jumping:
-                    self.curr_image = self.load_image(f'run{self.current_run}.png', True)
+                    self.curr_image = self.load_image(f'janosik{self.current_run}.png', True)
             self.x_velocity = -2
         else:
             self.animation_timer += 1
-            if self.animation_timer % 20 == 0:
+            if self.animation_timer % 2 == 0:
                 self.animation_timer = 0
-                self.current_idle = (self.current_idle + 1) % 2
+                self.current_idle = (self.current_idle + 1) % 5
                 flip = False
                 if self.image_rotation == 'left':
                     flip = True
-                self.curr_image = self.load_image(f'idle{self.current_idle}.png', flip)
+                self.curr_image = self.load_image(f'janosik{self.current_run}.png', flip)
             self.x_velocity = 0
         self.rect.x += self.x_velocity
         if (key[py.K_SPACE] or key[py.K_UP]) and not self.jumping:
             self.jumping = True
             self.y_vel = self.jump_height
         if self.jumping:
+            self.current_jump = (self.current_jump+1)%5
             if self.image_rotation == 'left':
-                self.curr_image = self.load_image(f'Adventurer_Flying.png', True)
+                self.curr_image = self.load_image(f'janosik{self.current_jump}.png', True)
             else:
-                self.curr_image = self.load_image(f'Adventurer_Flying.png', False)
+                self.curr_image = self.load_image(f'janosik{self.current_jump}.png', False)
             self.y_vel -= self.y_gravity
             if self.y_vel < -self.jump_height:
                 self.y_vel = -self.jump_height
@@ -94,8 +96,14 @@ class Player(py.sprite.Sprite):
         standing = self.is_standing(objects)
         if not standing and self.jumping == False:
             self.rect.y += 5
+            self.current_jump = (self.current_jump+1)%5
+            if self.image_rotation == 'left':
+                self.curr_image = self.load_image(f'janosik{self.current_jump}.png', True)
+            else:
+                self.curr_image = self.load_image(f'janosik{self.current_jump}.png', False)
         if not standing and self.rect.y >= 561:
                 self.jumping = False
+                self.standing = True
                 self.rect.y = 561
 
 
