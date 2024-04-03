@@ -68,7 +68,7 @@ class SNH:
                 self.peniaz.x = 1200
                 self.peniaz.generate()
                 self.gros_y = objects[-1].y - 100
-                self.scorebanner.set_grose(self.scorebanner.grose+1)
+            self.scorebanner.set_grose(self.peniaz.amount)
 
             for gros in self.peniaz.coords:
                 if abs(self.gros_bg + gros[0] - self.player.rect.x) < 50 and abs(self.gros_y - gros[1] - self.player.rect.y) < 50:
