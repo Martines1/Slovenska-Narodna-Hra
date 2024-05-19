@@ -5,6 +5,7 @@ from structure_creator import StructureCreator
 from player import Player
 from scorebanner import Scorebanner
 from Gros import Gros
+from pygame import mixer
 
 
 class SNH:
@@ -32,6 +33,12 @@ class SNH:
 
         py.init()
 
+        #music init
+        mixer.init()
+        mixer.music.load("music/melisko.mp3")
+        mixer.music.set_volume(0.5)
+        self.coin_effect = mixer.Sound("music/bomboclat.mp3")
+
         self.timer = py.time.Clock()
         self.running = True
         self.peniaz = Gros()
@@ -42,10 +49,12 @@ class SNH:
         self.player = Player()
         self.all_sprites = py.sprite.Group()
         self.all_sprites.add(self.player)
-        self.game_speed = 2
+        self.game_speed = 4
 
 
     def run(self):
+        mixer.music.play()
+        
         while (self.running):
 
             self.timer.tick(self.fps)
@@ -54,13 +63,13 @@ class SNH:
             self.pozadie.obrazovka.blit(self.pozadie.fixed_background,[0,0])
             for i in range(0, self.tiles):
                 self.pozadie.obrazovka.blit(self.pozadie.background, [i * self.bg_width + self.scroll_background, 2])
-            self.scroll_background -= 2
+            self.scroll_background -= 4
             if (abs(self.scroll_background) > self.bg_width):
                 self.scroll_background = 0
             for entity in self.all_sprites:
                 self.pozadie.obrazovka.blit(entity.curr_image, entity.rect)
 
-            self.gros_bg -= 2
+            self.gros_bg -= 4
 
             if self.gros_bg == -50 * (self.peniaz.width + 1):
                 print("lk")
@@ -74,6 +83,7 @@ class SNH:
                 if abs(self.gros_bg + gros[0] - self.player.rect.x) < 50 and abs(self.gros_y - gros[1] - self.player.rect.y) < 50:
                     self.peniaz.coords.remove(gros)
                     self.peniaz.amount += 1
+                    mixer.Channel(0).play(self.coin_effect, maxtime=1000)
                     continue
                 self.pozadie.obrazovka.blit(self.peniaz.drawGros(), [self.gros_bg + gros[0],self.gros_y - gros[1]])
 
@@ -107,7 +117,7 @@ class SNH:
                         for o in object_:
                             objects.append(o)
 
-            self.scroll_obstacles -= 2
+            self.scroll_obstacles -= 4
             self.player.update(pressed_key, objects)
             for _object in objects:
                 if (self.player.rect.x + 75 >= _object.left

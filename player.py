@@ -59,7 +59,7 @@ class Player(py.sprite.Sprite):
                     self.image_rotation = 'right' 
                 if not self.jumping:
                     self.curr_image = self.load_image(f'janosik{self.current_run}.png', flip)
-            self.x_velocity = 4
+            self.x_velocity = 8
         elif key[K_LEFT]:
             self.animation_timer += 1
             if self.animation_timer % 2 == 0:
@@ -68,7 +68,7 @@ class Player(py.sprite.Sprite):
                     self.image_rotation = 'left' 
                 if not self.jumping:
                     self.curr_image = self.load_image(f'janosik{self.current_run}.png', True)
-            self.x_velocity = -2
+            self.x_velocity = -4
         else:
             self.animation_timer += 1
             if self.animation_timer % 2 == 0:
