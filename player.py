@@ -17,13 +17,13 @@ class Player(py.sprite.Sprite):
         else:
             delimiter = '/'
         # pociatocna pozicia hraca
-        self.y_position = 561
+        self.y_position = 575
         self.x_position = 100
         self.image_source = "images" + delimiter 
         super(Player, self).__init__()
         self.jumping = False
         self.curr_image = self.load_image('janosik0.png')
-        self.rect = py.Rect(50, 350, 75, 100)
+        self.rect = py.Rect(50, 350, 75, 80)
         self.number_of_animations = 5
         self.rect.x = self.x_position
         self.rect.y = self.y_position
@@ -42,7 +42,7 @@ class Player(py.sprite.Sprite):
         width = 75
         height = 100
         new_image = py.image.load(self.image_source + image)
-        new_image = py.transform.scale(new_image, (width, height))
+        #new_image = py.transform.scale(new_image, (width, height))
         new_image = py.transform.flip(new_image, flip, False)
         return new_image
     
@@ -64,7 +64,7 @@ class Player(py.sprite.Sprite):
         standing = self.is_standing(objects)
         if not standing and self.jumping == False:
             self.fall()
-        if not standing and self.rect.y >= 561:
+        if not standing and self.rect.y >= 575:
             self.stay_on_ground()
                 
 
@@ -131,13 +131,13 @@ class Player(py.sprite.Sprite):
     def stay_on_ground(self):
         self.jumping = False
         self.standing = True
-        self.rect.y = 561
+        self.rect.y = 575
 
 
     def is_standing(self, objects):
         for _object in objects:
-            if _object.y + 10 >= self.rect.y + 100 >= _object.y -10  and ((self.rect.x + 75 >= _object.left and self.rect.x + 75 <= _object.right) or (self.rect.x >= _object.left and self.rect.x <= _object.right)):
-                self.rect.y = _object.y - 100
+            if _object.y + 10 >= self.rect.y + 80 >= _object.y -10  and ((self.rect.x + 75 >= _object.left and self.rect.x + 75 <= _object.right) or (self.rect.x >= _object.left and self.rect.x <= _object.right)):
+                self.rect.y = _object.y - 80
                 self.y_vel = 0
                 self.jumping = False
                 return True
