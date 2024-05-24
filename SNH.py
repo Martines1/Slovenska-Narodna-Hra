@@ -5,12 +5,12 @@ from structure_creator import StructureCreator
 from player import Player
 from scorebanner import Scorebanner
 from Gros import Gros
+from pygame import mixer
 
 
 class SNH:
 
     def __init__(self):
-
         self.WIDTH = 1200
         self.HEIGHT = 700
         self.fps = 60
@@ -18,6 +18,7 @@ class SNH:
         self.scroll_background = 0
         self.scroll_obstacles = 0
         self.world_phase = 0  # 0-pozadie.png
+        self.zandar_phase = 0
 
         self.structure_creator = StructureCreator()
         self.pozadie = Pozadie(WIDTH=self.WIDTH, HEIGHT=self.HEIGHT)
@@ -32,18 +33,29 @@ class SNH:
 
         py.init()
 
+        #music init
+        mixer.init()
+        mixer.music.load("music/melisko.mp3")
+        mixer.music.set_volume(0.5)
+        self.coin_effect = mixer.Sound("music/bomboclat.mp3")
+
         self.timer = py.time.Clock()
         self.running = True
         self.peniaz = Gros()
+        self.peniaz.generate()
+        self.gros_y = 250
 
         # nacitaj hraca
         self.player = Player()
         self.all_sprites = py.sprite.Group()
+        self.player.rect.y = 571
         self.all_sprites.add(self.player)
-        self.game_speed = 2
+        self.game_speed = 4
 
 
     def run(self):
+        mixer.music.play()
+        
         while (self.running):
 
             self.timer.tick(self.fps)
@@ -52,28 +64,32 @@ class SNH:
             self.pozadie.obrazovka.blit(self.pozadie.fixed_background,[0,0])
             for i in range(0, self.tiles):
                 self.pozadie.obrazovka.blit(self.pozadie.background, [i * self.bg_width + self.scroll_background, 2])
-            self.scroll_background -= 2
+            self.scroll_background -= 4
             if (abs(self.scroll_background) > self.bg_width):
                 self.scroll_background = 0
             for entity in self.all_sprites:
                 self.pozadie.obrazovka.blit(entity.curr_image, entity.rect)
 
-            self.gros_bg -= 2
+            self.gros_bg -= 4
+
+            zandar = py.image.load(f"images/zandar{self.zandar_phase % 5}.png").convert_alpha()
+            self.pozadie.obrazovka.blit(zandar,(0,560))
+            self.zandar_phase += 1
 
             if self.gros_bg == -50 * (self.peniaz.width + 1):
                 self.gros_bg = 1200
                 self.peniaz.x = 1200
                 self.peniaz.generate()
                 self.gros_y = objects[-1].y - 100
-                self.scorebanner.set_grose(self.scorebanner.grose+1)
+            self.scorebanner.set_grose(self.peniaz.amount)
 
             for gros in self.peniaz.coords:
-                if abs(self.gros_bg + gros[0] - self.player.rect.x) < 50 and abs(self.peniaz.y - gros[1] - self.player.rect.y) < 50:
+                if abs(self.gros_bg + gros[0] - self.player.rect.x) < 50 and abs(self.gros_y - gros[1] - self.player.rect.y) < 50:
                     self.peniaz.coords.remove(gros)
                     self.peniaz.amount += 1
-                    self.scorebanner.set_grose(self.peniaz.amount)
+                    mixer.Channel(0).play(self.coin_effect, maxtime=1000)
                     continue
-                self.pozadie.obrazovka.blit(self.peniaz.drawGros(), [self.gros_bg + gros[0],self.peniaz.y - gros[1]])
+                self.pozadie.obrazovka.blit(self.peniaz.drawGros(), [self.gros_bg + gros[0],self.gros_y - gros[1]])
 
             # Update a kreslenie scorebannera
             self.scorebanner.update()
@@ -105,7 +121,7 @@ class SNH:
                         for o in object_:
                             objects.append(o)
 
-            self.scroll_obstacles -= 2
+            self.scroll_obstacles -= 4
             self.player.update(pressed_key, objects)
             for _object in objects:
                 if (self.player.rect.x + 75 >= _object.left
@@ -122,6 +138,7 @@ class SNH:
                     self.running = False
             # py.draw.rect(pozadie.obrazovka,(0,0,0),[player.rect.x,player.rect.y,75,100]) #75 100pozadie.obrazovka,(204,102,0),[b_x,b_y-300,300,300])
             # py.display.flip()
+
             py.display.update()
 
         py.quit()
