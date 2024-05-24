@@ -5,6 +5,8 @@ from structure_creator import StructureCreator
 from player import Player
 from scorebanner import Scorebanner
 from Gros import Gros
+from bear import Bear
+from fireplace import Fireplace
 from pygame import mixer
 import menu
 from save import Save
@@ -85,9 +87,13 @@ class SNH:
         self.wait_for_start()
         mixer.music.play()
         start_time = py.time.get_ticks()
+        fireplace_anim_time_treshold = 300  # ms
+        fireplace_anim_time = 0  # ms
         while self.running:
             self.timer.tick(self.fps)
             pressed_key = py.key.get_pressed()
+
+            # draw backgroung
             self.pozadie.obrazovka.blit(self.pozadie.fixed_background, [0, 0])
             for i in range(0, self.tiles):
                 self.pozadie.obrazovka.blit(self.pozadie.background, [i * self.bg_width + self.scroll_background, 2])
@@ -97,6 +103,7 @@ class SNH:
             for entity in self.all_sprites:
                 self.pozadie.obrazovka.blit(entity.curr_image, entity.rect)
 
+            # gros stuff
             self.gros_bg -= 4
 
             if self.gros_bg == -50 * (self.peniaz.width + 1):
@@ -116,8 +123,9 @@ class SNH:
                 self.pozadie.obrazovka.blit(self.peniaz.drawGros(), [self.gros_bg + gros[0], self.gros_y - gros[1]])
             self.scorebanner.update(start_time)
             self.scorebanner.draw()
-            base_x = 1200
-            base_y = 661
+
+
+            # player is dragged along with the scene
             self.player.rect.move_ip(-self.game_speed, 0)
 
             if self.player.rect.x < 10:
@@ -125,12 +133,33 @@ class SNH:
             if self.player.rect.x + 75 > 1180:
                 self.player.rect.x = 1180 - 75
 
+            #create and draw objects
+            base_x = 1200
+            base_y = 661
             objects = []
+            lethal_objects = []
             objects.append(py.draw.rect(self.pozadie.obrazovka, (53, 55, 33), [0, 661, 1200, 1]))  # ground
+            if py.time.get_ticks() - fireplace_anim_time > fireplace_anim_time_treshold:
+                Fireplace.animation_timer = (Fireplace.animation_timer + 1) % Fireplace.num_fireplace_anim_images
+                fireplace_anim_time = py.time.get_ticks()
+                print("Fireplace animation switch")
             if self.world_phase == 0:  # forest
                 for obstacle in self.obstacles_forest:
                     if obstacle == "nic":
                         base_x += 80
+                    elif obstacle == "medved":
+                        bear = Bear(base_x, base_y)
+                        bear.x_pos = base_x + self.scroll_obstacles
+                        bear.y_pos = base_y - Bear.height / 2
+                        bear.draw(self.pozadie)
+                        lethal_objects.append(bear)
+                        base_x += Bear.width * 2
+
+                    elif obstacle == "vatra":
+                        fireplace = Fireplace(base_x + self.scroll_obstacles, base_y)
+                        fireplace.draw(self.pozadie)
+                        lethal_objects.append(fireplace)
+                        base_x += Fireplace.width * 2
                     else:
                         object_ = self.structure_creator.draw(self.pozadie, obstacle, base_x + self.scroll_obstacles, base_y)
                         move_by = object_[-1]
@@ -139,13 +168,29 @@ class SNH:
                         for o in object_:
                             objects.append(o)
 
+
             self.scroll_obstacles -= 4
             self.player.update(pressed_key, objects)
+
+            # handle object collision
             for _object in objects:
                 if self.player.rect.x + 75 >= _object.left and self.player.rect.x + 75 < _object.right and self.player.rect.bottom - 1 > _object.y + 1:
                     self.player.rect.x = _object.left - 75
                 elif self.player.rect.x <= _object.right and self.player.rect.x > _object.left and self.player.rect.bottom - 1 > _object.y + 1:
                     self.player.rect.x = _object.right
+
+            for lethal in lethal_objects:
+                if isinstance(lethal, Bear):
+                    if lethal.left() < self.player.rect.x - 75 < lethal.right() + Bear.width / 4 and self.player.rect.y > lethal.up() and self.player.rect.y - 100 < lethal.down():
+                        print("Player", self.player.rect.x, self.player.rect.y)
+                        print("Bear", lethal.x_pos, lethal.y_pos)
+                        lethal.animation_timer += 1
+                        self.running = False
+                elif isinstance(lethal, Fireplace):
+                    if self.player.rect.x - 75 > lethal.left() + Fireplace.width / 4 and self.player.rect.x - 75 < lethal.right() + Fireplace.width / 4  and self.player.rect.y > lethal.up() - Fireplace.height / 2 and self.player.rect.y < lethal.down() - Fireplace.height / 2:
+                        print("Player", self.player.rect.x, self.player.rect.y)
+                        print("Fireplace", lethal.x_pos, lethal.y_pos)
+                        self.running = False
 
             for event in py.event.get():
                 if event.type == py.QUIT:
