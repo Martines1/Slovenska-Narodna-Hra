@@ -187,7 +187,10 @@ class SNH:
                         lethal.animation_timer += 1
                         self.running = False
                 elif isinstance(lethal, Fireplace):
-                    if self.player.rect.x - 75 > lethal.left() + Fireplace.width / 4 and self.player.rect.x - 75 < lethal.right() + Fireplace.width / 4  and self.player.rect.y > lethal.up() - Fireplace.height / 2 and self.player.rect.y < lethal.down() - Fireplace.height / 2:
+                    if (self.player.rect.x - 75 > lethal.left() + Fireplace.width / 2
+                            and self.player.rect.x - 75 < lethal.right() + Fireplace.width / 2
+                            and self.player.rect.y > lethal.up()
+                            and self.player.rect.y < lethal.down()):
                         print("Player", self.player.rect.x, self.player.rect.y)
                         print("Fireplace", lethal.x_pos, lethal.y_pos)
                         self.running = False

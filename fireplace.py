@@ -5,9 +5,10 @@ class Fireplace(AnimatedObject):
     images = []
     image = 'vatra'
     num_fireplace_anim_images = 3
+    scale = 1.5
     for i in range(1, num_fireplace_anim_images + 1):
         images.append(py.image.load(AnimatedObject.image_source + image + str(i) + '.png'))
-
+        images[i-1] = py.transform.scale(images[i-1], (int(images[i-1].get_width() * scale), int(images[i-1].get_height() * scale)))
     width = images[0].get_width()
     height = images[0].get_height()
 
