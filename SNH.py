@@ -36,9 +36,13 @@ class SNH:
 
         # music init
         mixer.init()
-        mixer.music.load("music/melisko.mp3")
+        mixer.music.load("music/bg.mp3")
         mixer.music.set_volume(0.5)
-        self.coin_effect = mixer.Sound("music/bomboclat.mp3")
+        self.coin_effect = mixer.Sound("music/minca.mp3")
+        self.bear_effect = mixer.Sound("music/maco.mp3")
+        self.fire_effect = mixer.Sound("music/ohen.mp3")
+        self.bear_is_playing = False
+        self.fire_is_playing = False
 
         self.timer = py.time.Clock()
         self.running = True
@@ -85,7 +89,7 @@ class SNH:
         self.menu.display_menu()
         self.menu.wait_for_input()
         self.wait_for_start()
-        mixer.music.play()
+        mixer.music.play(loops=-1)
         start_time = py.time.get_ticks()
         fireplace_anim_time_treshold = 300  # ms
         fireplace_anim_time = 0  # ms
@@ -143,6 +147,8 @@ class SNH:
                 Fireplace.animation_timer = (Fireplace.animation_timer + 1) % Fireplace.num_fireplace_anim_images
                 fireplace_anim_time = py.time.get_ticks()
                 print("Fireplace animation switch")
+            bear_on_screen = False
+            fire_on_screen = False
             if self.world_phase == 0:  # forest
                 for obstacle in self.obstacles_forest:
                     if obstacle == "nic":
@@ -151,12 +157,18 @@ class SNH:
                         bear = Bear(base_x, base_y)
                         bear.x_pos = base_x + self.scroll_obstacles
                         bear.y_pos = base_y - Bear.height / 2
+
+                        if(bear.x_pos>-200 and bear.x_pos<1400):
+                            bear_on_screen = True
+
                         bear.draw(self.pozadie)
                         lethal_objects.append(bear)
                         base_x += Bear.width * 2
 
                     elif obstacle == "vatra":
                         fireplace = Fireplace(base_x + self.scroll_obstacles, base_y)
+                        if(base_x + self.scroll_obstacles>-200 and base_x + self.scroll_obstacles<1400):
+                            fire_on_screen = True
                         fireplace.draw(self.pozadie)
                         lethal_objects.append(fireplace)
                         base_x += Fireplace.width * 2
@@ -168,6 +180,21 @@ class SNH:
                         for o in object_:
                             objects.append(o)
 
+            if(bear_on_screen):
+                if(not self.bear_is_playing):
+                    self.bear_is_playing = True
+                    self.bear_effect.play(loops=-1)
+            else:
+                self.bear_effect.stop()
+                self.bear_is_playing = False
+
+            if(fire_on_screen):
+                if(not self.fire_is_playing):
+                    self.fire_is_playing = True
+                    self.fire_effect.play(loops=-1)
+            else:
+                self.fire_effect.stop()
+                self.fire_is_playing = False
 
             self.scroll_obstacles -= 4
             self.player.update(pressed_key, objects)
@@ -187,10 +214,7 @@ class SNH:
                         lethal.animation_timer += 1
                         self.running = False
                 elif isinstance(lethal, Fireplace):
-                    if (self.player.rect.x - 75 > lethal.left() + Fireplace.width / 2
-                            and self.player.rect.x - 75 < lethal.right() + Fireplace.width / 2
-                            and self.player.rect.y > lethal.up()
-                            and self.player.rect.y < lethal.down()):
+                    if self.player.rect.x - 75 > lethal.left() + Fireplace.width / 4 and self.player.rect.x - 75 < lethal.right() + Fireplace.width / 4  and self.player.rect.y > lethal.up() - Fireplace.height / 2 and self.player.rect.y < lethal.down() - Fireplace.height / 2:
                         print("Player", self.player.rect.x, self.player.rect.y)
                         print("Fireplace", lethal.x_pos, lethal.y_pos)
                         self.running = False
