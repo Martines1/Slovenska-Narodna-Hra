@@ -20,6 +20,7 @@ class SNH:
         self.scroll_background = 0
         self.scroll_obstacles = 0
         self.world_phase = 0  # 0-pozadie.png
+        self.zandar_phase = 0
 
         self.structure_creator = StructureCreator()
         self.pozadie = Pozadie(WIDTH=self.WIDTH, HEIGHT=self.HEIGHT)
@@ -109,6 +110,10 @@ class SNH:
 
             # gros stuff
             self.gros_bg -= 4
+            
+            zandar = py.image.load(f"images/zandar{self.zandar_phase % 5}.png").convert_alpha()
+            self.pozadie.obrazovka.blit(zandar, (0, 560))
+            self.zandar_phase += 1
 
             if self.gros_bg == -50 * (self.peniaz.width + 1):
                 print("lk")
