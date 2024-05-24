@@ -143,10 +143,11 @@ class SNH:
             objects = []
             lethal_objects = []
             objects.append(py.draw.rect(self.pozadie.obrazovka, (53, 55, 33), [0, 661, 1200, 1]))  # ground
-            if py.time.get_ticks() - fireplace_anim_time > fireplace_anim_time_treshold:
+
+            if py.time.get_ticks() - fireplace_anim_time > fireplace_anim_time_treshold: # timer for fireplace animation
                 Fireplace.animation_timer = (Fireplace.animation_timer + 1) % Fireplace.num_fireplace_anim_images
                 fireplace_anim_time = py.time.get_ticks()
-                print("Fireplace animation switch")
+
             bear_on_screen = False
             fire_on_screen = False
             if self.world_phase == 0:  # forest
@@ -209,14 +210,14 @@ class SNH:
             for lethal in lethal_objects:
                 if isinstance(lethal, Bear):
                     if lethal.left() < self.player.rect.x - 75 < lethal.right() + Bear.width / 4 and self.player.rect.y > lethal.up() and self.player.rect.y - 100 < lethal.down():
-                        print("Player", self.player.rect.x, self.player.rect.y)
-                        print("Bear", lethal.x_pos, lethal.y_pos)
+                        # print("Player", self.player.rect.x, self.player.rect.y)
+                        # print("Bear", lethal.x_pos, lethal.y_pos)
                         lethal.animation_timer += 1
                         self.running = False
                 elif isinstance(lethal, Fireplace):
-                    if self.player.rect.x - 75 > lethal.left() + Fireplace.width / 4 and self.player.rect.x - 75 < lethal.right() + Fireplace.width / 4  and self.player.rect.y > lethal.up() - Fireplace.height / 2 and self.player.rect.y < lethal.down() - Fireplace.height / 2:
-                        print("Player", self.player.rect.x, self.player.rect.y)
-                        print("Fireplace", lethal.x_pos, lethal.y_pos)
+                    if self.player.rect.x - 75 > lethal.left() + Fireplace.width / 1.5 and self.player.rect.x - 75 < lethal.right() + Fireplace.width / 3  and self.player.rect.y > lethal.up() - Fireplace.height / 4 and self.player.rect.y < lethal.down() - Fireplace.height / 4:
+                        # print("Player", self.player.rect.x, self.player.rect.y)
+                        # print("Fireplace", lethal.x_pos, lethal.y_pos)
                         self.running = False
 
             for event in py.event.get():
