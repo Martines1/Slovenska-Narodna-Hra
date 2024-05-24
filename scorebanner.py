@@ -21,6 +21,7 @@ class Scorebanner:
     def set_grose(self, grose):
         self.grose = grose
         self.grose_counter = self.text_font.render(str(grose), False, self.color_rgb)
+        
     def set_time(self, time):
         millis = time
         seconds = (millis / 1000) % 60.
@@ -36,6 +37,6 @@ class Scorebanner:
         self.snh.pozadie.obrazovka.blit(self.time_text, self.time_text_rect)
         self.snh.pozadie.obrazovka.blit(self.grose_counter, self.grose_counter_rect)
 
-    def update(self):
-        self.set_time(py.time.get_ticks())
+    def update(self, start_time):
+        self.set_time(py.time.get_ticks() - start_time)
         self.draw()
